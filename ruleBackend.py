@@ -63,18 +63,19 @@ class Topic:
 
     def messagehandler(self,mqc,userdata,msg):
         payload=str(msg.payload.decode("utf-8"))
+        topic=str(msg.topic)
         if self.react_on == "on_message":
-            self.executeRule(payload)
+            self.executeRule(payload,topic)
         else:
             if self.react_on.startswith("on_payload:"):
                 stripped=self.react_on.lstrip("on_payload:")
                 if payload == stripped:
-                    self.executeRule(payload)
+                    self.executeRule(payload,topic)
             else:
                 if self.react_on == "on_change":
                     if self.oldPayload is not None:
                         if self.oldPayload != payload:
-                            self.executeRule(payload)
+                            self.executeRule(payload,topic)
                         self.oldPayload=payload
                     else:
                         self.oldPayload=payload
@@ -87,9 +88,9 @@ class Topic:
     def on_log(client, userdata, level, buff):
         print("log: ",buff)
 
-    def executeRule(self,payload):
+    def executeRule(self,payload,topic):
         try:
-            self.rule(payload)
+            self.rule(payload,topic)
         except Exception as e:
             print("Error when executing rule: "+str(e))
 
