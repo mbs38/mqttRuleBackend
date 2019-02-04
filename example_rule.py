@@ -4,56 +4,62 @@ import time
 host="localhost"
 port=1883
 ruleBackend.init(host,port)
+# if you need authentication, use: ruleBackend.init(host,port,user,password)
 
 #######################################################
-# Welche states sollen zusätzlich verfügbar sein?
+# Which states do you want to be available?
 someBool1 = ruleBackend.State("modbus/sth/state")
 someInt1 = ruleBackend.State("modbus/int/state")
-# Achtung! Die types von den States sind immer String.
+# Attention: type of the states is always string
+# One word on timing: If a rule and a state have the same topic,
+# make sure you initialize the state before you initialize the rule
+# (in this example line 11 and 12 before lines 46 to 50). Otherwise
+# the state will be updated after the rule has been executed.
 
 #######################################################
-# Hier die Regeln definieren.
+# Define the rules here:
 
-#eine globale Variable
+# a global variable
 zaehler = 1
 
 def rule1(payload,topic):
     global zaehler
     print(topic+": "+payload)
-    print("Rufe Regel 1 auf.")
-    print("..und zwar zum "+str(zaehler)+" Mal!")
+    print("Calling rule 1")
+    print("..for the "+str(zaehler)+" time")
     zaehler = zaehler + 1
 
 def rule2(payload,topic):
-    print("Rufe Regel 2 auf.")
+    print("Calling rule 2")
     print(topic+": "+payload)
     if zaehler > 4:
-        print("1. Regel wurde schon mehr als 3 mal aufgerufen! Frechheit!")
+        print("1. rule has been called "+zaehler+"times!")
 
 def rule3(payload,topic):
-    print("Rufe Regel 3 auf.")
+    print("Calling rule 3")
     print(topic+": "+payload)
 
 
 #######################################################
-# Auf welche Topic soll welche Regel unter welchen
-# Umständen reagieren?
+# set topics the rules will trigger on
 
-#löst aus, wenn sich der Wert ändert
+#is triggered when the value changes
 ruleBackend.topics.append(ruleBackend.Topic(rule1,"device/someCrap1/state","on_change"))
-#löst aus, wenn irgendwas kommt auf der Topic
+#is triggered whenever a new message arrives on the topic
 ruleBackend.topics.append(ruleBackend.Topic(rule2,"device/someCrap2/state","on_message"))
-#löst aus, wenn eine Message kommt deren Payload 1234 ist.
+#is triggered when the message payload is '1234'
 ruleBackend.topics.append(ruleBackend.Topic(rule3,"device/someCrap3/state","on_payload:1234"))
 
 #######################################################
 
 ruleBackend.start()
 
-# Zugreifen auf states:
+#main loop
 while ruleBackend.connected:
     time.sleep(1)
 
-    #print("State sth"+someBool1.state)
-    #print("State int"+someInt1.state)
-    #ruleBackend.publisher.send("modbus/blah/fasel","True")
+#how to use states 
+    print("State sth: "+someBool1.state)
+    print("State int: "+someInt1.state)
+#how to send a message
+    ruleBackend.publisher.send("device/dog/bark","True")
