@@ -7,30 +7,30 @@ topics=[]
 publisher=None
 subscriber=None
 
-host=""
-port=0
 
-def init(h,p):
-    global host
-    global port
-    host = h
-    port = p
-    
+def init(host,port,user,password):
     global publisher
-    publisher = Publisher(host,port)
+    publisher = Publisher(host,port,user,password)
     global subscriber
-    subscriber = Subscriber(host,port)
+    subscriber = Subscriber(host,port,None,None)
 
+def init(host,port):
+    global publisher
+    publisher = Publisher(host,port,None,None)
+    global subscriber
+    subscriber = Subscriber(host,port,None,None)
 
 def start():
     subscriber.connect()
 
 class Subscriber:
-    def __init__(self,host,port):
+    def __init__(self,host,port,user,pw):
         self.clientid=None
         self.mqc=None
         self.host=host
         self.port=port
+        self.user=user
+        self.pw=pw
         self.topics=[]
         self.handlers=[]
         self.clientid="mqttRuleBackend-subscriber-"+ str(time.time())
@@ -41,6 +41,8 @@ class Subscriber:
     
     def connect(self):
         self.mqc=mqtt.Client(client_id=self.clientid)
+        if self.user is not None and self.pw is not None:
+            self.mqc.username_pw_set(self.user,self.pw)
         self.mqc.on_connect=self.connecthandler
         self.mqc.on_message=self.messagehandler
         self.mqc.on_log=self.on_log
@@ -64,12 +66,16 @@ class Subscriber:
         print("log: ",buff)
 
 class Publisher:
-    def __init__(self,host,port):
+    def __init__(self,host,port,user,pw):
         self.host=host
         self.port=port
+        self.user=user
+        self.pw=pw
         self.clientid="mqttRuleBackend-publisher-"+ str(time.time())
         print("New client: "+self.clientid)
         self.mqc=mqtt.Client(client_id=self.clientid)
+        if self.user is not None and self.pw is not None:
+            self.mqc.username_pw_set(self.user,self.pw)
         self.mqc.on_log=self.on_log
         self.mqc.disconnected = True
         self.mqc.connect(self.host,self.port,60)
