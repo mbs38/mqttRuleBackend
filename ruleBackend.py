@@ -2,6 +2,7 @@ import time
 import paho.mqtt.client as mqtt
 import signal
 import sys
+import threading
 
 topics=[]
 publisher=None
@@ -124,9 +125,11 @@ class Topic:
         
     def executeRule(self,payload,topic):
         try:
-            self.rule(payload,topic)
+            sbl=threading.Thread(target=self.rule,args=(payload,topic))
+            sbl.daemon = True
+            sbl.start()
         except Exception as e:
-            print("Error when executing rule: "+str(e))
+           print("Error when executing rule: "+str(e))
 
 
 class State:
