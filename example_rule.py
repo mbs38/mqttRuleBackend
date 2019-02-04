@@ -48,7 +48,12 @@ ruleBackend.topics.append(ruleBackend.Topic(rule2,"device/someCrap2/state","on_m
 #löst aus, wenn eine Message kommt deren Payload 1234 ist.
 ruleBackend.topics.append(ruleBackend.Topic(rule3,"device/someCrap3/state","on_payload:1234"))
 
+
+
 #######################################################
+
+ruleBackend.start()
+
 # Zugreifen auf states:
 while True:
     time.sleep(1)
