@@ -86,10 +86,6 @@ class Topic:
         self.topic=topic
         self.react_on=react_on
         self.oldPayload=None
-        global host
-        global port
-        self.host=host
-        self.port=port
         self.rule=rule
 
         subscriber.addTopic(self.topic,self.messagehandler)
