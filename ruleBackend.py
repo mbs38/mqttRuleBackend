@@ -6,7 +6,12 @@ import sys
 topics=[]
 publisher=None
 subscriber=None
+connected=None
 
+def disconnecthandler(mqc,userdata,rc):
+    print("Disconnected from broker")
+    global connected
+    connected = False
 
 def init(host,port,user,password):
     global publisher
@@ -44,11 +49,14 @@ class Subscriber:
         if self.user is not None and self.pw is not None:
             self.mqc.username_pw_set(self.user,self.pw)
         self.mqc.on_connect=self.connecthandler
+        self.mqc.on_disconnect=disconnecthandler
         self.mqc.on_message=self.messagehandler
         self.mqc.on_log=self.on_log
         self.mqc.disconnected = True
         self.mqc.connect(self.host,self.port,60)
         self.mqc.loop_start()
+        global connected
+        connected = True
         print("New client: "+self.clientid)
     
     def messagehandler(self,mqc,userdata,msg):
@@ -78,6 +86,7 @@ class Publisher:
             self.mqc.username_pw_set(self.user,self.pw)
         self.mqc.on_log=self.on_log
         self.mqc.disconnected = True
+        self.mqc.on_disconnect=disconnecthandler
         self.mqc.connect(self.host,self.port,60)
         self.mqc.loop_start()    
 
@@ -133,25 +142,11 @@ class State:
     def on_log(client, userdata, level, buff):
         print("log: ",buff)
 
-control=None
 
-class Control:
-    def __init__(self):
-        self.runLoop = True
-    def stopLoop(self):
-        self.runLoop = False
 
 def signal_handler(signal, frame):
-        control.stopLoop()
-        print('Exiting ' + sys.argv[0])
+    print('Exiting ' + sys.argv[0])
+    global connected
+    connected = False
+
 signal.signal(signal.SIGINT, signal_handler)
-
-def run():
-    global control
-    control = Control()
-    while control.runLoop:
-        time.sleep(1)
-    sys.exit(1)
-
-
- 
