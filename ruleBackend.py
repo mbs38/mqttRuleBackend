@@ -14,17 +14,11 @@ def disconnecthandler(mqc,userdata,rc):
     global connected
     connected = False
 
-def init(host,port,user,password):
+def init(host,port,user=None,password=None):
     global publisher
     publisher = Publisher(host,port,user,password)
     global subscriber
-    subscriber = Subscriber(host,port,None,None)
-
-def init(host,port):
-    global publisher
-    publisher = Publisher(host,port,None,None)
-    global subscriber
-    subscriber = Subscriber(host,port,None,None)
+    subscriber = Subscriber(host,port,user,password)
 
 def start():
     subscriber.connect()
