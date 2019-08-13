@@ -3,8 +3,10 @@ import time
 
 host="localhost"
 port=1883
-ruleBackend.init(host,port)
-# if you need authentication, use: ruleBackend.init(host,port,user,password)
+user = ""
+password = ""
+ruleBackend.init(host,port,user,password)
+# if you need authentication change user and password accordingly
 
 #######################################################
 # Which states do you want to be available?
