@@ -63,7 +63,7 @@ class Subscriber:
 
     def connecthandler(self,mqc,userdata,flags,rc):
         self.mqc.subscribe(self.topics)
-        print("Subscribing to: "+self.topics)
+        print("Subscribing to: "+str(self.topics))
 
     def on_log(client, userdata, level, buff):
         print("log: ",buff)
