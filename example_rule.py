@@ -35,7 +35,7 @@ def rule2(payload,topic):
     print("Calling rule 2")
     print(topic+": "+payload)
     if zaehler > 4:
-        print("1. rule has been called "+zaehler+"times!")
+        print("1. rule has been called "+str(zaehler)+"times!")
 
 def rule3(payload,topic):
     print("Calling rule 3")
